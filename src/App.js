@@ -23,6 +23,9 @@ const App = () =>{
     //分頁
     const [currentPage, setCurrentPage] = useState(1);//預設當前 page
     const [cardsPerPage] = useState(4);
+    const [isDeafultPage, setIsDeafultPage] = useState(false);
+    const [checkMyList, setCheckMyList] = useState([]);
+   
 
 //API 資料
 // 初始值
@@ -43,6 +46,11 @@ useEffect(()=>{
             })
 
           });
+          if(JSON.parse(localStorage.getItem('myFavoirite')!==null)){
+            setCheckMyList(JSON.parse(localStorage.getItem('myFavoirite')));
+         
+          }
+           
         },
         (sError) => {
           setState({
@@ -78,6 +86,9 @@ const getCurrentZone =(zone) =>{
     // console.log('getCurrentZone',zone);
     
     // 在 getCurrentZone function 中，cardsByZone 在跑完 filter 後狀態會改變
+    setCurrentPage(1);
+    setIsDeafultPage(true);
+    // console.log('setIsDefaultChange',isDefaultChange);
     setState({
         ...state, // keep 住當前的狀態 ask!
         currentZone:zone,
@@ -86,7 +97,13 @@ const getCurrentZone =(zone) =>{
             return element.Zone === zone;
         })
 
-      });    
+      }); 
+
+    // if(JSON.parse(localStorage.getItem('myFavoirite')!==null)){
+    //     setCheckMyList(JSON.parse(localStorage.getItem('myFavoirite')));
+     
+    //   }
+
 }
 
 //scrollOnTop 監聽事件
@@ -102,7 +119,11 @@ const { cards,itemZones,cardsByZone,currentZone,} = state;
  const currentCards = cardsByZone.slice(indexOfFirstCard, indexOfLastCard);//slice去頭不含尾 取得部分資料
 
  // Change page
- const paginate = pageNumber => setCurrentPage(pageNumber);
+ const paginate = pageNumber => {
+  setIsDeafultPage(false);
+  setCurrentPage(pageNumber);
+  
+ }
  
 return (
     <div className="App">
@@ -131,7 +152,12 @@ return (
             <ul className="list">
                 {/* 因為新增分頁功能所以要改成 currentCards */}
             {currentCards.map(function(card){
-                return<Card key={card.Id} item={card}/>
+                if(checkMyList!=null && checkMyList.indexOf(card.Id)>=0){
+                  return<Card key={card.Id} item={card} isFavorite={true} myList={checkMyList}/>
+                }else{
+                  return<Card key={card.Id} item={card} isFavorite={false} myList={checkMyList}/>
+                }
+              
                   // 通常 map 要加上 key (固定值)
             })}
             </ul>
@@ -145,6 +171,7 @@ return (
         cardsPerPage={cardsPerPage}
         totalPosts={cardsByZone.length}
         paginate={paginate}
+        isDeafultPage = {isDeafultPage}
       />
     </div>
     

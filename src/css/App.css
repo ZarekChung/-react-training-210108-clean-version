@@ -312,6 +312,12 @@ header hr{
     background: #8A82CC;
     color:white;
 }
+.active{
+    
+    background: #8A82CC;
+    color:white;
+}
+
 .disable{
     color: grey;
     pointer-events: none; 
